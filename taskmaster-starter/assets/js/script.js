@@ -33,7 +33,7 @@ var loadTasks = function() {
 
   // loop over object properties
   $.each(tasks, function(list, arr) {
-    console.log(list, arr);
+    // console.log(list, arr);
     // then loop over sub-array
     arr.forEach(function(task) {
       createTask(task.text, task.date, list);
@@ -44,7 +44,17 @@ var loadTasks = function() {
 var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
-
+//create the created p element to be edit by using on.click this class, 
+//and take "this" attributes in textarea and replaceWith textInput.
+$(".list-group").on("click", "p", function() {
+  var text = $(this).text().trim();
+  var textInput = $("<textarea>")
+  .addClass("form-control")
+  .val(text);
+  
+  $(this).replaceWith(textInput);
+  textInput.trigger("focus");
+});
 
 
 
@@ -79,6 +89,7 @@ $("#task-form-modal .btn-primary").click(function() {
     });
 
     saveTasks();
+    
   }
 });
 
