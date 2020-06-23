@@ -17,45 +17,50 @@ var createTask = function(taskText, taskDate, taskList) {
   // append to ul list on the page
   $("#list-" + taskList).append(taskLi);
 };
-$(".card .list-group").sortable({
-  connectWith: $(".card .list-group"),
-  scroll: false,
-  tolerance: "pointer",
-  helper: "clone",
+
+// SORTABLE TASKS
+$('.card .list-group').sortable({
+  connectWith: $('.card .list-group'),
+  scroll: false, 
+  tolerance: 'pointer',
+  helper: 'clone',
   activate: function(event) {
-    console.log("activate", this);
+    $(this).addClass('dropover');
+    $('.bottom-trash').addClass('bottom-trash-drag');
   },
   deactivate: function(event) {
-    console.log("deactivate", this);
-  },
+    $(this).removeClass('dropover');
+    $('.bottom-trash').removeClass('bottom-trash-drag');
+  }, 
   over: function(event) {
-    console.log("over", event.target);
+    $(event.target).addClass('dropover-active');
   },
   out: function(event) {
-    console.log("out", event.target);
+    $(this).removeClass('dropover-active');
   },
+  // fired when contents have been re-ordered within a list, when an item is removed from a list, or when an item is added to a list.  so moving from one column to the other will fire the update method on both moved from and moved to columns
   update: function(event) {
-  // array to store the task data in
-var tempArr = [];
+    // array to store the task data in
+    var tempArr = [];
 
-// loop over current set of children in sortable list
-$(this).children().each(function() {
-  var text = $(this)
-    .find("p")
-    .text()
-    .trim();
+    // loop over current set of children in sortable list.  in the case of a task moving from one column to another, each column (.list-group) will have it's own children that it will push into it's own tempArr with the object data for the task
+    $(this).children().each(function() {
+      var text = $(this)
+        .find('p')
+        .text()
+        .trim();
 
-  var date = $(this)
-    .find("span")
-    .text()
-    .trim();
+      var date = $(this)
+        .find('span')
+        .text()
+        .trim();
 
-  // add task data to the temp array as an object
-  tempArr.push({
-    text: text,
-    date: date
-  });
-});
+      // add task data to the temp array as an object
+      tempArr.push({
+        text: text, 
+        date: date
+      })
+    });
 
 console.log(tempArr);
 // trim down list's ID to match object property
@@ -260,6 +265,11 @@ $("#remove-tasks").on("click", function() {
   }
   saveTasks();
 });
+setInterval(function () {
+  $(".card .list-group-item").each(function (el) {
+    auditTask(el);
+  });
+}, (1000 * 60) * 30);
 var auditTask = function(taskEl) {
   // get date from task element
   var date = $(taskEl).find("span").text().trim();
@@ -277,6 +287,12 @@ var auditTask = function(taskEl) {
     else if (Math.abs(moment().diff(time, "days")) <= 2) {
       $(taskEl).addClass("list-group-item-warning");
     }
+    // setInterval(function () {
+    //   $(".card .list-group-item").each(function (el) {
+    //     auditTask(el);
+    //     console.log(taskEl)
+    //   });
+    // }, 5000);
 };
 // load tasks for the first time
 loadTasks();
